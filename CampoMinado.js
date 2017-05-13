@@ -3,6 +3,7 @@ var quadradinho = {
     bomba: false,
     proximidade: 0,
     revelado: false,
+    marcado : false,
     col: 0,
     lin: 0,
     x: 0,
@@ -16,6 +17,9 @@ var quadradinho = {
     d: function() {
         if (!this.revelado) {
             fill(0,100,250);
+            if (this.marcado) {
+                fill(0,240,4);
+            }
             rect(this.x,this.y,this.s,this.s);
         } else {
             fill(255);
@@ -57,6 +61,17 @@ var quadradinho = {
                 }    
             });
         }
+    },
+    desarmar: function () {
+        marcadas =0;
+        for(i=0;i<tabuleiro.lenght; i ++){
+            if(tabuleiro[i].marcado) {
+                marcadas++   
+            }
+        }
+        if(marcadas<qtb){
+            this.marcado = true
+        }
     }
 };
 
@@ -74,17 +89,22 @@ for (c = 0; c < colunas; c++){
 }
 
 var qtb = 20;
+var bombas = qtb;
 
-while (qtb > 0) {
+while (bombas > 0) {
     var target = tabuleiro.length;
     var aleatorio = Math.random() * target;
     var qbomba = Math.floor(aleatorio);
     if(!tabuleiro[qbomba].bomba) {
         tabuleiro[qbomba].bomba = true;
+        tabuleiro[qbomba].proximidade= - 1;
         vizinhos = tabuleiro[qbomba].vizinhos();
         vizinhos.forEach(function(v) {
-            v.proximidade++;
-        })
+            if(!v.bomba){
+                v.proximidade++;
+            }
+            
+        });
         qtb--;
     }
 }
@@ -135,5 +155,19 @@ function verificaClique(q) {
     
     if (cliqueX == q.col && cliqueY == q.lin) {
         q.revelar();
+    }
+}
+
+function keyPressed() {
+    if(key == ' '){
+        tabuleiro.forEach(verificaClique);
+    }
+}
+function verificaDesarme(q) {
+    cliqueX = Math.floor(mouseX / q.s);
+    cliqueY = Math.floor(mouseY / q.s);
+    
+    if (cliqueX == q.col && cliqueY == q.lin) {
+        q.desarmar();
     }
 }
