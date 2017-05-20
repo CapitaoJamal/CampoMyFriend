@@ -46,6 +46,7 @@ var quadradinho = {
     revelar: function() {
         if(!this.revelado && !this.bomba) {
             this.revelado = true;
+            this.marcado = false;
             if(this.proximidade==0){
                 vizinhos = this.vizinhos();
                 vizinhos.forEach(function(q){
@@ -60,22 +61,28 @@ var quadradinho = {
                     q.revelar();
                 }    
             });
+            gameover = true;
         }
     },
     desarmar: function () {
+        if (this.marcado){
+            this.marcado = false;
+        }else {
         marcadas =0;
         for(i=0;i<tabuleiro.lenght; i ++){
             if(tabuleiro[i].marcado) {
                 marcadas++   
             }
         }
-        if(marcadas<qtb){
+        if(marcadas<qtb && !this.revelado){
             this.marcado = true
+            }
         }
     }
 };
 
 var tabuleiro = [];
+var gameover = false;
 
 var colunas = 15;
 var linhas = 15;
@@ -88,7 +95,7 @@ for (c = 0; c < colunas; c++){
     }
 }
 
-var qtb = 20;
+var qtb = 3;
 var bombas = qtb;
 
 while (bombas > 0) {
@@ -105,7 +112,7 @@ while (bombas > 0) {
             }
             
         });
-        qtb--;
+        bombas--;
     }
 }
 
@@ -116,13 +123,21 @@ function setup() {
 
 function draw() {
     background(255);
+    textSize(12);
     tabuleiro.forEach(function (q){
         q.d();
     });
+    
+if (gameover) {
+    textSize(80);
+    fill(0);
+    text("Game Over", width/2, height/2);
+    
+    }
 }
 
 function mousePressed() {
-    tabuleiro.forEach(verificaClique);
+    if (!gameover) tabuleiro.forEach(verificaClique);
 }
 function verificaClique(q) {
     cliqueX = Math.floor(mouseX / q.s);
@@ -134,35 +149,29 @@ function verificaClique(q) {
     }
 }
 
-function setup() {
-    createCanvas(800,600);
-    textAlign(CENTER, CENTER)
-}
-
-function draw() {
-    background(255);
-    tabuleiro.forEach(function (q){
-        q.d();
-    });
-}
-
-function mousePressed() {
-    tabuleiro.forEach(verificaClique);
-}
-function verificaClique(q) {
-    cliqueX = Math.floor(mouseX / q.s);
-    cliqueY = Math.floor(mouseY / q.s);
-    
-    if (cliqueX == q.col && cliqueY == q.lin) {
-        q.revelar();
-    }
-}
-
 function keyPressed() {
-    if(key == ' '){
-        tabuleiro.forEach(verificaClique);
+    if(key == ' ' && !gameover){
+        tabuleiro.forEach(verificaDesarme);
     }
 }
+
+function verificaVitoria() {
+    
+    bombas = [];
+    for(i=0;i<tabuleiro.lenght;i++){
+        if(tabuleiro[i].bomba){
+            bombas.push(tabuleiro[i]);
+        }
+    }
+    console.log(bombas);
+    for(i=0;i<bombas.lenght;i++){
+        if(!bombas[i].marcado) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function verificaDesarme(q) {
     cliqueX = Math.floor(mouseX / q.s);
     cliqueY = Math.floor(mouseY / q.s);
