@@ -68,12 +68,7 @@ var quadradinho = {
         if (this.marcado){
             this.marcado = false;
         }else {
-        marcadas =0;
-        for(i=0;i<tabuleiro.lenght; i ++){
-            if(tabuleiro[i].marcado) {
-                marcadas++   
-            }
-        }
+       
         if(marcadas<qtb && !this.revelado){
             this.marcado = true
             }
@@ -95,7 +90,7 @@ for (c = 0; c < colunas; c++){
     }
 }
 
-var qtb = 3;
+var qtb = 20;
 var bombas = qtb;
 
 while (bombas > 0) {
@@ -122,17 +117,35 @@ function setup() {
 }
 
 function draw() {
+    marcadas =0;
+    for(i=0;i<tabuleiro.length; i++){
+        if(tabuleiro[i].marcado) {
+            marcadas++ ;  
+        }
+    }
     background(255);
     textSize(12);
     tabuleiro.forEach(function (q){
         q.d();
     });
     
-if (gameover) {
+    textAlign(LEFT,CENTER);
+    fill(0);
+    text(qtb+ " bombas no tabuleiro", 520,20);
+    text(marcadas + " bombas marcadas", 520,40);
+    
+    
+    textAlign(CENTER,CENTER);
+    
+    if (gameover) {
+        textSize(80);
+        fill(0);
+        text("Game Over", width/2, height/2);
+    }
+    if (verificaVitoria()) {
     textSize(80);
     fill(0);
-    text("Game Over", width/2, height/2);
-    
+    text("Vitória", width/2, height/2);
     }
 }
 
@@ -156,16 +169,14 @@ function keyPressed() {
 }
 
 function verificaVitoria() {
-    
-    bombas = [];
-    for(i=0;i<tabuleiro.lenght;i++){
+    listab = [];
+    for(i=0;i<tabuleiro.length;i++){
         if(tabuleiro[i].bomba){
-            bombas.push(tabuleiro[i]);
+            listab.push(tabuleiro[i]);
         }
     }
-    console.log(bombas);
-    for(i=0;i<bombas.lenght;i++){
-        if(!bombas[i].marcado) {
+    for(i=0;i<listab.length;i++){
+        if(!listab[i].marcado) {
             return false;
         }
     }
